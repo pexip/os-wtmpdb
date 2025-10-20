@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/pkg-info.mk
+include /usr/share/debhelper/dh_package_notes/package-notes.mk
+
+CONFOPTS=-Dsplit-usr=false -Dwtmpdbd=disabled
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+bindnow
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(CONFOPTS)
+
+# Notes:
+#  1. Do not add a boot entry on installation because most likely we are
+#     either not running in the target system or we have migrated the wtmp
+#     boot entry and in all cases we did not just boot up.
+#  2. Do not install the rotation service because log rotation is handled
+#     by logrotate(8) and the competing (half) solution would be especially
+#     harmful if boith methods were enabled by misconfiguration.
+override_dh_installsystemd:
+	dh_installsystemd -pwtmpdb --no-start --no-stop-on-upgrade wtmpdb-update-boot.service
+	dh_installsystemd -Nwtmpdb
+
+override_dh_installinit:
+	dh_installinit --name=wtmpdb-update-boot --no-start --no-stop-on-upgrade
+
+override_dh_installlogrotate:
+	dh_installlogrotate --name=wtmpdb

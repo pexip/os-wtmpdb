@@ -1,0 +1,27 @@
+From: Andrew Bower <andrew@bower.uk>
+Date: Wed, 9 Apr 2025 19:06:10 +0100
+Forwarded: https://github.com/thkukuk/wtmpdb/pull/37
+Applied-Upstream: commit:8a09bf99d79b79e9b83aea704d0eb1b5de55e3ea
+Subject: import: match login by tty if non-zero pid does not match
+
+The existing code matches a utmp logout entry to a login entry by the preferred
+pid method if possible and then by tty if the pid is zero. This does not
+correspond to some servers that record the logout with a different value in the
+pid field, resulting in the logout times being recorded as 'crash'.
+---
+ src/import.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/import.c b/src/import.c
+index d03bd0c..b34a086 100644
+--- a/src/import.c
++++ b/src/import.c
+@@ -114,7 +114,7 @@ import_utmp_records (const char *db_path,
+ 	    {
+ 	      if (v->ut_type == UTMP_USER_PROCESS &&
+ 		  ((u->ut_pid != 0 && v->ut_pid == u->ut_pid) ||
+-		   (u->ut_pid == 0 && strncmp (v->ut_line, u->ut_line, UT_LINESIZE) == 0)))
++		   (strncmp (v->ut_line, u->ut_line, UT_LINESIZE) == 0)))
+ 		{
+ 		  id = id_map[v - utmp_data];
+ 		  if (id > 0)

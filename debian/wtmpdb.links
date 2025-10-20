@@ -1,0 +1,2 @@
+usr/bin/wtmpdb usr/bin/last
+usr/share/man/man8/wtmpdb.8.gz usr/share/man/man1/last.1.gz

@@ -1,0 +1,207 @@
+From: Andrew Bower <andrew@bower.uk>
+Date: Thu, 9 Oct 2025 22:02:22 +0100
+Subject: Use /var/log/wtmp.db as default database location
+
+Forwarded: not-needed
+---
+ README.md                        |  2 +-
+ lib/libwtmpdb.c                  |  3 +++
+ man/pam_wtmpdb.8.xml             | 15 ++++++++++++---
+ man/wtmpdb.8.xml                 | 21 +++++++++++++++------
+ src/pam_wtmpdb.c                 |  3 +++
+ tmpfiles.d/wtmpdb.conf           |  1 +
+ units/wtmpdb-rotate.service      |  2 +-
+ units/wtmpdb-update-boot.service |  2 +-
+ 8 files changed, 37 insertions(+), 12 deletions(-)
+
+diff --git a/README.md b/README.md
+index e2f8a0f..2e02328 100644
+--- a/README.md
++++ b/README.md
+@@ -30,7 +30,7 @@ The package constists of a library, PAM module, a commandline interface and an o
+ * `wtmpdb` is used to add reboot and shutdown entries and to display existing entries (like `last`).
+ * `wtmpdbd` is used to manage the database in a secure way.
+ 
+-By default the database will be written as `/var/lib/wtmpdb/wtmp.db`.
++By default the database will be written as `/var/log/wtmp.db`, with a symbolic link from `/var/lib/wtmpdb/wtmp.db`.
+ 
+ ## Configuration
+ 
+diff --git a/lib/libwtmpdb.c b/lib/libwtmpdb.c
+index 8e5f2d9..a0c54e3 100644
+--- a/lib/libwtmpdb.c
++++ b/lib/libwtmpdb.c
+@@ -38,6 +38,9 @@
+ 
+ #include "varlink.h"
+ 
++#undef _PATH_WTMPDB
++#define _PATH_WTMPDB "/var/log/wtmp.db"
++
+ #if WITH_WTMPDBD
+ static int varlink_is_active = 1;
+ #else
+diff --git a/man/pam_wtmpdb.8.xml b/man/pam_wtmpdb.8.xml
+index 2781648..54a2c4f 100644
+--- a/man/pam_wtmpdb.8.xml
++++ b/man/pam_wtmpdb.8.xml
+@@ -36,7 +36,7 @@
+     <para>
+       pam_wtmpdb is a PAM module to record the login and logout
+       information of the user. The module uses
+-      <filename>/var/lib/wtmpdb/wtmp.db</filename> as database
++      <filename>/var/log/wtmp.db</filename> as database
+       file to store all information.
+     </para>
+     <para>
+@@ -90,7 +90,7 @@
+         <listitem>
+           <para>
+             Use <option>file</option> instead of
+-            <filename>/var/lib/wtmpdb/wtmp.db</filename>.
++            <filename>/var/log/wtmp.db</filename>.
+           </para>
+         </listitem>
+       </varlistentry>
+@@ -166,11 +166,20 @@
+     <title>FILES</title>
+     <variablelist>
+       <varlistentry>
+-        <term>/var/lib/wtmpdb/wtmp.db</term>
++        <term>/var/log/wtmp.db</term>
+         <listitem>
+           <para>Wtmpdb logging database file</para>
+         </listitem>
+       </varlistentry>
++      <varlistentry>
++        <term>/var/lib/wtmpdb/wtmp.db</term>
++        <listitem>
++          <para>
++            Symbolic link from the upstream location to the above
++            database file
++          </para>
++        </listitem>
++      </varlistentry>
+     </variablelist>
+   </refsect1>
+ 
+diff --git a/man/wtmpdb.8.xml b/man/wtmpdb.8.xml
+index ba4975b..04e1b06 100644
+--- a/man/wtmpdb.8.xml
++++ b/man/wtmpdb.8.xml
+@@ -49,7 +49,7 @@
+         <listitem>
+           <para>
+ 	    <command>wtmpdb last</command> goes through the
+-	    <filename>/var/lib/wtmpdb/wtmp.db</filename> database (or the
++	    <filename>/var/log/wtmp.db</filename> database (or the
+ 	    database designated by the <command>-f</command> option) and
+ 	    displays a list of of all users logged in and logged out. The
+ 	    output can be restricted to different patterns via various
+@@ -242,7 +242,7 @@
+         <listitem>
+           <para>
+ 	    <command>wtmpdb boot</command> writes system boot times
+-	    to the <filename>/var/lib/wtmpdb/wtmp.db</filename> database.
++	    to the <filename>/var/log/wtmp.db</filename> database.
+ 	  </para>
+ 	  <title>boot options</title>
+ 	  <varlistentry>
+@@ -273,7 +273,7 @@
+         <listitem>
+           <para>
+ 	    <command>wtmpdb shutdown</command> writes system shutdown
+-	    requests to the <filename>/var/lib/wtmpdb/wtmp.db</filename>
++	    requests to the <filename>/var/log/wtmp.db</filename>
+ 	    database.
+ 	  </para>
+ 	  <title>shutdown options</title>
+@@ -295,7 +295,7 @@
+         <listitem>
+           <para>
+ 	    <command>wtmpdb rotate</command> exports old log entries
+-	    to the <filename>/var/lib/wtmpdb/wtmp_yyyymmmdd.db</filename>
++	    to the <filename>/var/log/wtmp_yyyymmmdd.db</filename>
+ 	    database and removes these entries from the original one.
+ 	  </para>
+ 	  <title>rotate options</title>
+@@ -331,7 +331,7 @@
+ 	<listitem>
+           <para>
+ 	    <command>wtmpdb import</command> imports legacy wtmp log
+-	    files to the <filename>/var/lib/wtmpdb/wtmp.db</filename>
++	    files to the <filename>/var/log/wtmp.db</filename>
+ 	    database.
+ 	  </para>
+ 	  <title>import options</title>
+@@ -378,11 +378,20 @@
+     <title>FILES</title>
+     <variablelist>
+       <varlistentry>
+-        <term>/var/lib/wtmpdb/wtmp.db</term>
++        <term>/var/log/wtmp.db</term>
+         <listitem>
+           <para>Wtmpdb logging database file</para>
+         </listitem>
+       </varlistentry>
++      <varlistentry>
++        <term>/var/lib/wtmpdb/wtmp.db</term>
++        <listitem>
++          <para>
++            Symbolic link from the upstream location to the above
++            database file
++          </para>
++        </listitem>
++      </varlistentry>
+     </variablelist>
+   </refsect1>
+ 
+diff --git a/src/pam_wtmpdb.c b/src/pam_wtmpdb.c
+index 8b5a24f..5aeaccb 100644
+--- a/src/pam_wtmpdb.c
++++ b/src/pam_wtmpdb.c
+@@ -36,6 +36,9 @@
+ 
+ #include "wtmpdb.h"
+ 
++#undef _PATH_WTMPDB
++#define _PATH_WTMPDB "/var/log/wtmp.db"
++
+ #define WTMPDB_DEBUG        01  /* send info to syslog(3) */
+ #define WTMPDB_QUIET        02  /* keep quiet about things */
+ #define WTMPDB_SKIP         04  /* Skip if service is in skip list */
+diff --git a/tmpfiles.d/wtmpdb.conf b/tmpfiles.d/wtmpdb.conf
+index f66548e..dcaf2a9 100644
+--- a/tmpfiles.d/wtmpdb.conf
++++ b/tmpfiles.d/wtmpdb.conf
+@@ -3,3 +3,4 @@
+ # See tmpfiles.d(5) for details
+ #
+ d /var/lib/wtmpdb 0755 - - -
++L /var/lib/wtmpdb/wtmp.db - - - - ../../log/wtmp.db
+diff --git a/units/wtmpdb-rotate.service b/units/wtmpdb-rotate.service
+index 7918857..465b659 100644
+--- a/units/wtmpdb-rotate.service
++++ b/units/wtmpdb-rotate.service
+@@ -1,7 +1,7 @@
+ [Unit]
+ Description=Rotate wtmpdb
+ Documentation=man:wtmpdb(8)
+-RequiresMountsFor=/var/lib/wtmpdb
++RequiresMountsFor=/var/log
+ 
+ [Service]
+ Type=oneshot
+diff --git a/units/wtmpdb-update-boot.service b/units/wtmpdb-update-boot.service
+index c46dcb9..bc16f7c 100644
+--- a/units/wtmpdb-update-boot.service
++++ b/units/wtmpdb-update-boot.service
+@@ -2,7 +2,7 @@
+ Description=Write boot and shutdown times into wtmpdb
+ Documentation=man:wtmpdb(8)
+ DefaultDependencies=no
+-RequiresMountsFor=/var/lib/wtmpdb
++RequiresMountsFor=/var/log
+ Conflicts=shutdown.target
+ After=systemd-remount-fs.service systemd-tmpfiles-setup.service
+ Before=shutdown.target

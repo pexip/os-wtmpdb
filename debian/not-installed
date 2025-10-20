@@ -1,0 +1,8 @@
+usr/lib/systemd/system/wtmpdb-rotate.service
+usr/lib/systemd/system/wtmpdb-rotate.timer
+usr/lib/systemd/system/wtmpdbd.service
+usr/lib/systemd/system/wtmpdbd.socket
+usr/libexec/wtmpdbd
+usr/share/man/man8/wtmpdbd.8
+usr/share/man/man8/wtmpdbd.service.8
+usr/share/man/man8/wtmpdbd.socket.8

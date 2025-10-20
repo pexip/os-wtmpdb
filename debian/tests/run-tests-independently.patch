@@ -1,0 +1,49 @@
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -1,7 +1,19 @@
+ # This file builds and runs the unit tests
++project(
++  'wtmpdb_tests',
++  'c',
++  meson_version : '>= 0.61.0',
++)
++add_project_arguments(['-D_GNU_SOURCE=1',
++		       '-DXTSTRINGDEFINES',
++		       '-D_FORTIFY_SOURCE=2',
++                       '-D_FILE_OFFSET_BITS=64',
++                       '-D_TIME_BITS=64'], language : 'c')
+ 
++cc = meson.get_compiler('c')
+ libdl = cc.find_library('dl')
+-
++libwtmpdb = dependency('libwtmpdb')
++inc = include_directories(['lib'])
+ 
+ tst_dlopen_exe = executable('tst-dlopen', 'tst-dlopen.c', dependencies : libdl)
+ test('tst-dlopen', tst_dlopen_exe, args : ['pam_wtmpdb.so'])
+@@ -11,21 +18,21 @@
+ 
+ tst_logwtmpdb = executable ('tst-logwtmpdb', 'tst-logwtmpdb.c',
+                         include_directories : inc,
+-                        link_with : libwtmpdb)
++                        dependencies : [libwtmpdb])
+ test('tst-logwtmpdb', tst_logwtmpdb)
+ 
+ tst_login_logout = executable ('tst-login-logout', 'tst-login-logout.c', 
+                         include_directories : inc,
+-                        link_with : libwtmpdb)
++                        dependencies : [libwtmpdb])
+ test('tst-login-logout', tst_login_logout)
+ 
+ tst_get_id = executable ('tst-get_id', 'tst-get_id.c',
+                         include_directories : inc,
+-                        link_with : libwtmpdb)
++                        dependencies : [libwtmpdb])
+ test('tst-get_id', tst_get_id)
+ 
+ tst_varlink = executable ('tst-varlink', 'tst-varlink.c',
+                         include_directories : inc,
+-                        link_with : libwtmpdb)
++                        dependencies : [libwtmpdb])
+ test('tst-varlink', tst_varlink)
+ 

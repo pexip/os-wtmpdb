@@ -1,0 +1,41 @@
+From: Andrew Bower <andrew@bower.uk>
+Date: Sat, 1 Mar 2025 08:14:49 +0000
+Forwarded: no
+Subject: avoid noise if systemd not running
+
+Don't output error messages if dbus or systemd not running. The soft reboot
+count query is irrelevant if they are not so there is no need to say anything
+to the user about it.
+
+---
+ src/wtmpdb.c | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/src/wtmpdb.c b/src/wtmpdb.c
+index 048e8b1..5062754 100644
+--- a/src/wtmpdb.c
++++ b/src/wtmpdb.c
+@@ -947,7 +947,6 @@ soft_reboots_count (void)
+ 
+   if (sd_bus_open_system (&bus) < 0)
+     {
+-      fprintf (stderr, "Error: cannot open dbus");
+       return -1;
+     }
+ 
+@@ -958,15 +957,6 @@ soft_reboots_count (void)
+ 				   &error, 'u', &soft_reboots_count);
+   if (r < 0)
+     {
+-      /* systemd is too old, don't print error */
+-      if (!sd_bus_error_has_name (&error, SD_BUS_ERROR_UNKNOWN_PROPERTY))
+-	{
+-	  /* error occured, log it and return to fallback code */
+-	  if (error.message)
+-	    fprintf (stderr,
+-		     "Failed to get SoftRebootsCount property: %s\n",
+-		     error.message);
+-	}
+       sd_bus_error_free (&error);
+       return -1;
+     }

@@ -1,0 +1,3 @@
+usr/include/wtmpdb.h
+usr/lib/${DEB_HOST_MULTIARCH}/libwtmpdb.so
+usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/libwtmpdb.pc

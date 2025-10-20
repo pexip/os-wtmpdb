@@ -1,0 +1,196 @@
+wtmpdb (0.73.0-3+deb13u1) trixie; urgency=medium
+
+  * Rotate and prune logs using logrotate (Closes: #1094965)
+    - patch to handle empty file reading
+    - remove units and cron jobs for old (disabled) rotation solution
+    - cause new and rotated files to keep permissions (Closes: #1076308)
+  * Store logs in system log directory, /var/log (Closes: #1117719)
+  * Remove logs on package purge
+  * README.Debian: document new log handling
+
+ -- Andrew Bower <andrew@bower.uk>  Mon, 20 Oct 2025 19:32:19 +0100
+
+wtmpdb (0.73.0-3) unstable; urgency=medium
+
+  * Do not rotate database by default because the rotation operation does
+    not prune and therefore only has negative utility for users.
+    (Mitigates: #1094965)
+
+ -- Andrew Bower <andrew@bower.uk>  Sun, 04 May 2025 18:39:33 +0100
+
+wtmpdb (0.73.0-2) unstable; urgency=medium
+
+  [ Andrew Bower ]
+  * pam-configs: inhibit likely duplicate ssh entries (Closes: #1102643)
+  * add README.Debian to document consequential differences from wtmp
+
+ -- Andrew Bower <andrew@bower.uk>  Fri, 11 Apr 2025 22:09:16 +0100
+
+wtmpdb (0.73.0-1) unstable; urgency=medium
+
+  [ Andrew Bower ]
+  * New upstream version
+    - drop patches adopted upstream
+    - fixes time specifications (Closes: #1102101)
+  * patch to fix import of logins recorded by some wtmp writers
+  * refine man page for debian, appeasing lintian
+  * d/control:
+    - further extend package descriptions (Closes: #1083228)
+    - mark libwtmpdb-dev as Multi-Arch: same
+  * d/copyright: set missing Upstream-Contact field
+
+ -- Andrew Bower <andrew@bower.uk>  Wed, 09 Apr 2025 19:29:42 +0100
+
+wtmpdb (0.72.0-2) unstable; urgency=medium
+
+  * d/control: depend -dev package on library to fix broken symlinks
+  * d/copyright: remove lrc override and document content not used in binary
+  * d/patches:
+    - fix last -t short option for --until (Closes: #1102102)
+    - mark hurd patches as applied upstream
+  * maintscripts:
+    - force one-off reset of runlevels for wtmpdb-update-boot on upgrade
+      from versions between 0.13.0-6 and 0.72.0-1 (Closes: #1102167)
+    - import /var/log/wtmp on first installation
+    - no need to record a boot entry on installation
+
+ -- Andrew Bower <andrew@bower.uk>  Sun, 06 Apr 2025 17:49:15 +0100
+
+wtmpdb (0.72.0-1) unstable; urgency=medium
+
+  [ Andrew Bower ]
+  * New upstream version
+    - drop format specifiers patch adopted upstream
+    - no other upstream changes in this release
+  * hurd: patch test to avoid PATH_MAX
+
+ -- Andrew Bower <andrew@bower.uk>  Thu, 06 Mar 2025 06:55:51 +0000
+
+wtmpdb (0.71.0+git20250228.4e4b54e-2) unstable; urgency=medium
+
+  * i386: use t64 for y2038 autopkgtest on t32 archs
+  * hurd: patch for lack of non-critical CLOCK_BOOTTIME
+  * init: fix single-shot properties of boot record service.
+    + Thanks to Lorenzo Puliti.
+    + Remove associated lintian override about runlevels.
+
+ -- Andrew Bower <andrew@bower.uk>  Wed, 05 Mar 2025 18:56:37 +0000
+
+wtmpdb (0.71.0+git20250228.4e4b54e-1) unstable; urgency=medium
+
+  [ Andrew Bower ]
+  * New maintainer (Closes: #1092022)
+  * New upstream version (Closes: #1099168)
+    - drop all patches; they are included upstream
+    - exclude new 'wtmpdbd' daemon from packaging
+    - include unreleased 'wtmpdb import' command (Closes: #1086559)
+  * Patch integer format string errors affecting ILP32 archs
+  * Patch out noisy logging when systemd not running
+  * Add symbol version mapping for libwtmpd0
+  * d/control
+    - add myself as maintainer
+    - already conforming with policy v4.7.2
+    - non-essential libaudit dependency not available for Hurd
+  * d/wtmpdb.cron.monthly
+    - appease SC2166
+    - squelch non-error output
+  * d/copyright: reflect additional and updated content
+  * d/lrc.config: do not check excluded wtmpdbd and varlink content
+  * add d/upstream/metadata
+  * dh_installinit: no-stop-on-upgrade
+
+  [ Maytham Alsudany ]
+  * Run upstream tests with autopkgtest
+
+ -- Andrew Bower <andrew@bower.uk>  Tue, 04 Mar 2025 20:07:14 +0000
+
+wtmpdb (0.13.0-6) unstable; urgency=medium
+
+  * QA upload.
+  * Patch erratic command line time parsing (LP: #2088387)
+  * Add initscript to write boot and shutdown entries.
+    Thanks to Mark Hindley <mark@hindley.org.uk> (Closes: #1094921)
+  * Minor changes to appease Lintian and lrc
+    - d/lrc.config: exclude false positive for test code
+    - d/rules: whitespace change
+    - pam: remove surplus lintian override following section move
+    - Override lintian false positive for pam module man page
+
+ -- Andrew Bower <andrew@bower.uk>  Wed, 05 Feb 2025 06:44:16 +0000
+
+wtmpdb (0.13.0-5) unstable; urgency=medium
+
+  * QA upload.
+  * Accept classic 'last -<number>' style of invocation (Closes: #1094286)
+  * d/wtmpdb.cron.monthly: rotate logs for all users
+  * d/.gitignore: add gitignore
+  * d/control: already conforming with policy v4.7.0
+
+ -- Andrew Bower <andrew@bower.uk>  Thu, 30 Jan 2025 01:11:01 +0000
+
+wtmpdb (0.13.0-4) unstable; urgency=medium
+
+  * Orphan package
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Fri, 03 Jan 2025 19:30:53 +0100
+
+wtmpdb (0.13.0-3) unstable; urgency=medium
+
+  * Use upstream patch for dbus Wants/After.
+    Thanks to Sven Joachim <svenjoac@gmx.de> (Closes: #1091699)
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Mon, 30 Dec 2024 10:12:10 +0100
+
+wtmpdb (0.13.0-2) unstable; urgency=medium
+
+  [ Justin B Rye ]
+  * Update package descriptions
+
+  [ Chris Hofstaedtler ]
+  * Want dbus.socket for org.freedesktop.systemd1.Manager (Closes: #1091641)
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Sun, 29 Dec 2024 13:40:55 +0100
+
+wtmpdb (0.13.0-1) unstable; urgency=medium
+
+  * New upstream version (Closes: #1076640).
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Sat, 27 Jul 2024 16:41:22 +0200
+
+wtmpdb (0.12.0-3) unstable; urgency=medium
+
+  * Stop using wtmpdb@packages.debian.org as maintainer.
+    Fails to deliver mails, unfortunately.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Sun, 14 Jul 2024 23:35:17 +0200
+
+wtmpdb (0.12.0-2) unstable; urgency=medium
+
+  * Bump version number to fix upload of unfinished 0.12.0-1.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Thu, 30 May 2024 00:50:48 +0200
+
+wtmpdb (0.12.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * d/watch: add.
+  * d/gbp.conf: fix compression setting
+  * Tighten package-local Depends on libwtmpdb0
+  * Install /usr/bin/last symlink, Break/Replace util-linux.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Thu, 30 May 2024 00:00:57 +0200
+
+wtmpdb (0.11.0-2) unstable; urgency=medium
+
+  * libwtmpdb-dev: fix Section to be libdevel
+  * libpam-wtmpdb: fix Section to be admin
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Sat, 27 Apr 2024 21:50:40 +0200
+
+wtmpdb (0.11.0-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #1068289)
+  * Introduces Priority: standard packages, as they are intended to
+    replace functionality previously provided by Essential: yes packages.
+
+ -- Chris Hofstaedtler <zeha@debian.org>  Wed, 03 Apr 2024 02:24:11 +0200

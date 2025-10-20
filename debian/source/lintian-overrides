@@ -1,0 +1,5 @@
+# These are taken care of by debputy
+wtmpdb source: debhelper-but-no-misc-depends libpam-wtmpdb
+wtmpdb source: debhelper-but-no-misc-depends libwtmpdb-dev
+wtmpdb source: debhelper-but-no-misc-depends libwtmpdb0
+wtmpdb source: debhelper-but-no-misc-depends wtmpdb

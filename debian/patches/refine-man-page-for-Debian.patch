@@ -1,0 +1,29 @@
+From: Andrew Bower <andrew@bower.uk>
+Date: Mon, 7 Apr 2025 09:36:19 +0100
+Forwarded: not-needed
+Subject: refine man page for Debian
+
+---
+ man/wtmpdb.8.xml | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/man/wtmpdb.8.xml b/man/wtmpdb.8.xml
+index 79988b1..f96f318 100644
+--- a/man/wtmpdb.8.xml
++++ b/man/wtmpdb.8.xml
+@@ -27,10 +27,13 @@
+ 
+     <para>
+       <command>wtmpdb</command> displays the content of the wtmp
+-      database and allows to create reboot and shutdown entries.
++      login and boot times database and provides sub-commands for
++      system scripts to create boot and shutdown entries and otherwise
++      manipulate the wtmp database.
+     </para>
+     <para>
+-      This command is Y2038 safe and uses sqlite3 to store the information.
++      This command is year 2038-safe and uses sqlite3 to store
++      the information.
+     </para>
+   </refsect1>
+ 

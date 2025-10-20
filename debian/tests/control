@@ -1,0 +1,2 @@
+Tests: upstream-tests
+Depends: @, build-essential, meson, pkgconf

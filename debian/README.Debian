@@ -1,0 +1,59 @@
+wtmpdb in Debian
+----------------
+
+Since Debian 13 "trixie", login and reboot records are recorded by the 'wtmpdb'
+solution in an sqlite3 database file. This document identifies differences in
+behaviour since earlier Debian releases that may require action by system
+administators.
+
+
+Log location
+------------
+
+The datafile for the login and reboot records is currently stored in the
+system log directory '/var/log' instead of the tool's state directory
+'/var/lib/wtmpdb' as defined upstream via /usr/include/wtmpdb.h. On Debian
+/var/lib/wtmpdb/wtmp.db should be a symbolic link to /var/log/wtmp.db.
+
+
+Logging SSH sessions
+--------------------
+
+Login sessions are recorded by default when libpam-wtmpdb is installed but
+when recorded this way the details may be limited, missing the terminal name.
+
+The SSH daemon provided by openssh-server can record richer login information
+directly with libwtmpdb0. To avoid duplicate login entries, libpam-wtmpdb is
+therefore installed with a default configuration that skips recording logins
+from sshd. When an alternative ssh daemon or a version of openssh-server
+compiled without wtmpdb integration is installed, this may result in no logins
+being recorded. To restore recording of ssh login sessions via the pam module,
+edit /etc/pam.d/common-session and remove the option 'skip_if=sshd' from the
+'pam_wtmpdb.so' line.
+
+
+Reading old wtmp log files
+--------------------------
+
+The 'last' tool provided by wtmpdb cannot read old login records stored in
+utmp(5) format in '/var/log/wtmp'. On installation, the wtmpdb package converts
+the existing wtmp log file if present (as is likely on an upgrade from Debian
+12 "bookworm") into wtmpdb format so that old records can immediately be read
+with the newly-installed 'last' command.
+
+If old rotated log files like /var/log/wtmp.1 are present, these can be
+manually converted with the 'wtmpdb import' command (specify '-f' if these are
+to be written to another file for archival rather than to the current login
+database). On default configurations, there are unlikely to be any older
+rotated files such as wtmp.2.gz but if there are, these can be uncompressed
+with gzip before being imported.
+
+
+Log rotation and pruning
+------------------------
+
+Logs are rotated and pruned by logrotate(8). The rotation and retention
+periods may be modified in /etc/logrotate.d/wtmpdb
+
+
+ -- Andrew Bower <andrew@bower.uk>  Wed, 24 Sep 2025 23:37:29 +0100

@@ -1,0 +1,105 @@
+From: Andrew Bower <andrew@bower.uk>
+Subject: Use empty memory table instead of failing to read empty file
+
+Forwarded: https://github.com/thkukuk/wtmpdb/pull/39
+Applied-Upstream: 0.75.0
+Bug-Debian: https://bugs.debian.org/1094965
+Last-Update: 2025-10-09
+
+Previously, attempting to read an empty file gave an error
+message and non-zero return code. Instead, when asked to open
+an empty file as a read-only database, open a memory database
+and populate it with an empty table. This avoids needing any
+special case handling in calling code and matches the behaviour
+of classic 'last' on an empty file.
+---
+ lib/sqlite.c | 47 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
+
+diff --git a/lib/sqlite.c b/lib/sqlite.c
+index 001eb71..0f3090c 100644
+--- a/lib/sqlite.c
++++ b/lib/sqlite.c
+@@ -61,12 +61,37 @@ strip_extension(char *in_str)
+     }
+ }
+ 
++/* Creates the table if it does not exist.
++ * Returns 0 on success, -1 on failure. */
++static int64_t
++create_table (sqlite3 *db, char **error)
++{
++  char *err_msg = NULL;
++  char *sql_table = "CREATE TABLE IF NOT EXISTS wtmp(ID INTEGER PRIMARY KEY, Type INTEGER, User TEXT NOT NULL, Login INTEGER, Logout INTEGER, TTY TEXT, RemoteHost TEXT, Service TEXT) STRICT;";
++
++  if (sqlite3_exec (db, sql_table, 0, 0, &err_msg) != SQLITE_OK)
++    {
++      if (error)
++	if (asprintf (error, "SQL error creating table: %s", err_msg) < 0)
++	  *error = strdup ("create_table: Out of memory");
++      sqlite3_free (err_msg);
++
++      return -1;
++    }
++  return 0;
++}
++
+ static int
+ open_database_ro (const char *path, sqlite3 **db, char **error)
+ {
++  struct stat statbuf;
++  int empty_file;
+   int r;
+ 
+-  r = sqlite3_open_v2 (path, db, SQLITE_OPEN_READONLY, NULL);
++  empty_file = stat(path, &statbuf) == 0 && statbuf.st_size == 0;
++  r = sqlite3_open_v2 (path, db, empty_file ?
++                       SQLITE_OPEN_READWRITE | SQLITE_OPEN_MEMORY :
++                       SQLITE_OPEN_READONLY, NULL);
+   if (r != SQLITE_OK)
+     {
+       if (error)
+@@ -80,7 +105,10 @@ open_database_ro (const char *path, sqlite3 **db, char **error)
+ 
+   sqlite3_busy_timeout(*db, TIMEOUT);
+ 
+-  return 0;
++  if (empty_file)
++    r = create_table (*db, error);
++
++  return r == SQLITE_OK ? 0 : -1;
+ }
+ 
+ static int
+@@ -114,7 +142,8 @@ open_database_rw (const char *path, sqlite3 **db, char **error)
+ 
+   sqlite3_busy_timeout(*db, TIMEOUT);
+ 
+-  return 0;
++  r = create_table (*db, error);
++  return r == SQLITE_OK ? 0 : -1;
+ }
+ 
+ /* Add a new entry. Returns ID (>=0) on success, -1 on failure. */
+@@ -123,21 +152,9 @@ add_entry (sqlite3 *db, int type, const char *user,
+ 	   uint64_t usec_login, const char *tty, const char *rhost,
+ 	   const char *service, char **error)
+ {
+-  char *err_msg = NULL;
+   sqlite3_stmt *res;
+-  char *sql_table = "CREATE TABLE IF NOT EXISTS wtmp(ID INTEGER PRIMARY KEY, Type INTEGER, User TEXT NOT NULL, Login INTEGER, Logout INTEGER, TTY TEXT, RemoteHost TEXT, Service TEXT) STRICT;";
+   char *sql_insert = "INSERT INTO wtmp (Type,User,Login,TTY,RemoteHost,Service) VALUES(?,?,?,?,?,?);";
+ 
+-  if (sqlite3_exec (db, sql_table, 0, 0, &err_msg) != SQLITE_OK)
+-    {
+-      if (error)
+-	if (asprintf (error, "add_entry: SQL error: %s", err_msg) < 0)
+-	  *error = strdup ("add_entry: Out of memory");
+-      sqlite3_free (err_msg);
+-
+-      return -1;
+-    }
+-
+   if (sqlite3_prepare_v2 (db, sql_insert, -1, &res, 0) != SQLITE_OK)
+     {
+       if (error)

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+mkdir -p $AUTOPKGTEST_TMP
+cp -r tests/ $AUTOPKGTEST_TMP/tests
+mkdir -p $AUTOPKGTEST_TMP/tests/lib
+cp lib/basics.h $AUTOPKGTEST_TMP/tests/lib/basics.h
+
+patch -p1 -d $AUTOPKGTEST_TMP < debian/tests/run-tests-independently.patch
+
+cd $AUTOPKGTEST_TMP/tests
+
+meson setup build
+cd build
+ln -s $(realpath /usr/lib/*/security/pam_wtmpdb.so) ./pam_wtmpdb.so
+
+meson test

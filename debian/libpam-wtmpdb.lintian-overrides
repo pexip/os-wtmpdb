@@ -1,0 +1,3 @@
+# It is standard practice for PAM modules to ship man pages in this section in
+# Debian.
+libpam-wtmpdb: spare-manual-page [usr/share/man/man8/pam_wtmpdb.8.gz]
