@@ -1,0 +1,92 @@
+Version 0.73.0
+* Expand accepted time format options (-p)
+* Use documented -t short option for last --until
+* Avoid PATH_MAX
+* hurd: compat for lack of CLOCK_BOOTTIME
+
+Version 0.72.0
+* Implement import function for old wtmp files
+* Fix rotate tests
+* Fixes for ix86
+
+Version 0.71.0
+* Fix installation of all wtmpdbd man page variants
+* Accept classic 'last -N' form for max entries
+* Fix: zero struct tm before calling strptime()
+
+Version 0.70.0
+* wtmpdbd: Exit after 30 seconds of idle time in socket activation mode
+* wtmpdbd: add Ping, SetLogLevel and GetEnvironment as varlink method
+* Merge reader/write socket to one generic one
+* Harden wtmpdbd.service
+* wtmpdb: Implement json output for last verb
+
+Version 0.50.0
+* Introduce wtmpdbd as single daemon accessing the database (#12)
+
+Version 0.13.0
+* Fix variable overflow on 32bit systems and check for this (#15)
+
+Version 0.12.0
+* boot: Query systemd if soft-reboot was done
+
+Version 0.11.0
+* last: add support for time-format option
+
+Version 0.10.0
+* last: support matching for username and/or tty
+
+Version 0.9.3
+* wtmpdb last: don't print date in the future if there is no db entry
+
+Version 0.9.2
+* Increase busy timeout DB access
+
+Version 0.9.1
+* Require meson 0.61.0 or newer
+* Fix printf format specifier on 32bit (#8)
+
+Version 0.9.0
+* Fix lot of 32bit/64bit signed/unsiged int conversations
+* Try to autodetect systemctl soft-reboot and use current
+  time instead of kernel boot time.
+
+Version 0.8.0
+* Fix linking with clang
+* wtmdb boottime: show boot time
+
+Version 0.7.1
+* wtmpdb last: Support "YYYY-MM-DD", "today" and "yesterday" as time option
+
+Version 0.7.0
+* wtmpdb rotate: use sqlite3_bind_* internal
+* wtmpdb last: Implement -x, -d, -i and -w options
+
+Version 0.6.0
+* wtmpdb rotate: move old log entries into wtmpdb_<yyyymmdd>.db
+
+Version 0.5.0
+* Use uint64_t instead of usec_t to avoid conflicts with other projects
+* wtmpdb boot: more accurate calculation of boot time
+
+Version 0.4.0
+* libwtmpdb: Use project version for library version
+* libwtmpdb: Always use _PATH_WTMPDB as fallback
+
+Version 0.3.0
+* pam_wtmpdb: Add skip_if option
+* Add manual pages
+* wtmpdb last: fix wtmp begins timestamp if no matching entry was found
+* wtmpdb last: Add --since and --until options
+* Add compat symlink for "last"
+* wtmpdb last: add --present option
+* wtmpdb last: implement -n/--limit
+* pam_wtmpdb: Try XDG_VTNR if PAM_TTY is not a tty
+
+Version 0.2.0
+* pam_lastlog: support PAM_XDISPLAY
+* wtmpdb last: show PAM service on request
+* wtmpdb: log audit records for boot/shutdown
+
+Version 0.1.0
+* First release

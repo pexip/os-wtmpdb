@@ -1,0 +1,30 @@
+[Unit]
+Description=wtmpdb daemon
+Documentation=man:wtmpdbd(8)
+
+[Service]
+Type=notify
+Environment="WTMPDBD_OPTS="
+EnvironmentFile=-/etc/default/wtmpdbd
+ExecStart=/usr/libexec/wtmpdbd -s $WTMPDBD_OPTS
+IPAddressDeny=any
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+ProtectSystem=strict
+RestrictRealtime=true
+ReadWritePaths=/run/wtmpdb /var/lib/wtmpdb
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes

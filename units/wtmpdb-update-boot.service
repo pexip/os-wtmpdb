@@ -1,0 +1,20 @@
+[Unit]
+Description=Write boot and shutdown times into wtmpdb
+Documentation=man:wtmpdb(8)
+DefaultDependencies=no
+RequiresMountsFor=/var/lib/wtmpdb
+Conflicts=shutdown.target
+After=systemd-remount-fs.service systemd-tmpfiles-setup.service
+Before=shutdown.target
+# Ask for the dbus socket.
+Wants=dbus.socket
+After=dbus.socket
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/wtmpdb boot
+ExecStop=/usr/bin/wtmpdb shutdown
+RemainAfterExit=true
+
+[Install]
+WantedBy=default.target

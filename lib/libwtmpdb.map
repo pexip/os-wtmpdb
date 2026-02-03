@@ -1,0 +1,22 @@
+LIBWTMPDB_0.1 {
+  global:
+	logwtmpdb;
+	wtmpdb_login;
+	wtmpdb_logout;
+	wtmpdb_read_all;
+	wtmpdb_timespec2usec;
+	wtmpdb_get_id;
+  local: *;
+};
+LIBWTMPDB_0.7 {
+  global:
+        wtmpdb_rotate;
+} LIBWTMPDB_0.1;
+LIBWTMPDB_0.8 {
+  global:
+        wtmpdb_get_boottime;
+} LIBWTMPDB_0.7;
+LIBWTMPDB_0.50 {
+  global:
+	wtmpdb_read_all_v2;
+} LIBWTMPDB_0.8;
