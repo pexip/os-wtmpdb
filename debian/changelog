@@ -1,3 +1,9 @@
+wtmpdb (0.73.0-3+deb13u1+pexip25u1) pexip-trixie; urgency=medium
+
+  * Initial import for trixie build.
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Wed, 04 Feb 2026 09:35:21 +0000
+
 wtmpdb (0.73.0-3+deb13u1) trixie; urgency=medium
 
   * Rotate and prune logs using logrotate (Closes: #1094965)
