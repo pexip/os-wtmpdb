@@ -15,13 +15,15 @@ Build-Depends:
  systemd-dev [linux-any],
  xsltproc,
 Priority: optional
-Maintainer: Andrew Bower <andrew@bower.uk>
+Maintainer: Pexip AS <packaging@pexip.com>\n
+XSBC-Pexip-Original-Maintainer: Andrew Bower <andrew@bower.uk>
 Section: admin
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
 Vcs-Browser: https://salsa.debian.org/debian/wtmpdb
 Vcs-Git: https://salsa.debian.org/debian/wtmpdb.git
 Homepage: https://github.com/thkukuk/wtmpdb/
+XS-Pexip-Upstream: http://deb.debian.org/debian/ trixie
 
 Package: wtmpdb
 Architecture: any
